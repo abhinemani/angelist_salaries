@@ -1,10 +1,12 @@
 require 'bundler'
 require 'json'
 
-all_jobs = JSON.parse(File.read("downloaded/1350507350.json"))
+VALID_LOCATIONS = ["Atlanta","Austin","Berkeley","Boston","Boulder","Burlingame","California","Cambridge","Culver City", "Cupertino","Dallas","Denver","Fremont","Houston","Las Vegas","Long Beach","Los Angeles","Los Gatos","Manhattan Beach","Mountain View","New Jersey","Menlo Park","Miami","Mill Valley","Milpitas","New York","New York City","Newark","Palm Beach","Palo Alto","Pasadena, CA", "Philadelphia","Phoenix","Pittsburg","Redmond","Redwood City","Reno","Sacramento","San Bruno","San Carlos, CA","San Diego","San Francisco","San Jose","San Mateo","San Ramon","Santa Barbara","Santa Clara, CA","Santa Cruz","Santa Monica","Santa Rosa","Saratoga","Seattle","Silicon Valley","Sonoma","Southern California","Stanford","Stockton","Sunnyvale","Tacoma","Tampa","Washington, DC"]
+
+latest_file = Dir.glob("downloaded/*.json").max_by {|f| File.mtime(f)}
+all_jobs = JSON.parse(File.read(latest_file))
 all_companies = {}
 selected_companies = []
-valid_locations = ["Atlanta","Austin","Berkeley","Boston","Boulder","Burlingame","California","Cambridge","Culver City", "Cupertino","Dallas","Denver","Fremont","Houston","Las Vegas","Long Beach","Los Angeles","Los Gatos","Manhattan Beach","Mountain View","New Jersey","Menlo Park","Miami","Mill Valley","Milpitas","New York","New York City","Newark","Palm Beach","Palo Alto","Pasadena, CA", "Philadelphia","Phoenix","Pittsburg","Redmond","Redwood City","Reno","Sacramento","San Bruno","San Carlos, CA","San Diego","San Francisco","San Jose","San Mateo","San Ramon","Santa Barbara","Santa Clara, CA","Santa Cruz","Santa Monica","Santa Rosa","Saratoga","Seattle","Silicon Valley","Sonoma","Southern California","Stanford","Stockton","Sunnyvale","Tacoma","Tampa","Washington, DC"]
 
 all_jobs.each do |job|
   company_id = job["startup"]["id"]
@@ -13,7 +15,7 @@ all_jobs.each do |job|
   location = job["tags"].detect { |t| t["tag_type"] == "LocationTag" }
   location = location["display_name"] if location
 
-  if valid_locations.include?(location)
+  if VALID_LOCATIONS.include?(location)
     unless all_companies[company_id]
       all_companies[company_id] = {
         :id => company_id,
